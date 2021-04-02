@@ -1,0 +1,25 @@
+#lang racket
+
+;; Recursion Notes
+
+(define consls (cons 42 (cons -1 (cons 3 (cons 1 (cons 7 '()))))))
+
+(define (length ls)
+  (if (equal? (cdr ls) '())
+      1
+      (+ 1 (length (cdr ls)))))
+
+(length consls)
+
+
+;; Lambda Notes
+
+((lambda (x) (+ x 3)) 2) ;; Procedure that takes in x and adds 3
+
+(exact? (sqrt 4))
+
+(define (g f) (lambda (x) (* 2 (* 2 (f x)))))
+(define foo (g (lambda (y) y)))
+(define (h f) (lambda (x) (f (f x))))
+(define bar (h (g (lambda (x) (* 3 x)))))
+(define x 'X)

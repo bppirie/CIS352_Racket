@@ -1,0 +1,21 @@
+#lang racket
+(define (expr? e)
+  (match e
+    [(? rational? n) #t]
+    [`(plus ,(? expr? e0) ,(? expr? e1)) #t]
+    [`(div ,(? expr? e0) ,(? expr? e1)) #t]
+    [`(not ,(? expr? e-guard)) #t]
+    [`(if ,(? expr? e0) ,(? expr? e1) ,(? expr? e2)) #t]
+    [_ #f]))
+
+(define/contract (step e)
+  (-> (lambda (x) (and (expr? x) (not (value? x)))) expr?)
+  (match e
+    [`(plus ,(? number? n0) ,(? number? n1)) (+ n0 n1)]
+    [`(plus ,(? number? n0) ,(? expr? e1)) `(plus ,n0 ,(step e1))]
+    [`(plus ,(? expr? e0) ,(? expr? e1)) `(plus ,(step e0) ,e1)]
+    [`(div ,(? number? n0) ,(? number? n1)) (/ n0 n1)]
+    [`(div ,(? number? n0) ,(? expr? e1)) `(div ,n0 ,(step e1))]
+    [`(div ,(? expr? e0) ,(? expr? e1)) `(div ,(step e0) ,e1)]
+    ;; write the rules for not and if here...
+    [_ (error (format "not sure how to step ~a" e))]))
